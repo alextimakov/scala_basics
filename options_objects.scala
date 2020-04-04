@@ -62,11 +62,26 @@ result2 should be(1)
 
 
 // objects in Scala are singletons, not static methods
+object Greeting {
+  def english = "Hi"
+
+  def espanol = "Hola"
+}
+
+val x = Greeting
+val y = x
+
+x eq y should be(true) //eq checks for reference
+
+val z = Greeting
+
+x eq z should be(true)
+
+// object that has the same name as a class is called a companion object of the class
 class Movie(val name: String, val year: Short)
 
 object Movie {
   def academyAwardBestMoviesForYear(x: Short) = {
-    //This is a match statement, more powerful than a Java switch statement!
     x match {
       case 1930 => Some(new Movie("All Quiet On the Western Front", 1930))
       case 1931 => Some(new Movie("Cimarron", 1931))
@@ -76,6 +91,17 @@ object Movie {
   }
 }
 
-Movie.academyAwardBestMoviesForYear(1932).get.name should be(
-"Grand Hotel"
-)
+Movie.academyAwardBestMoviesForYear(1932).get.name should be("Grand Hotel")
+
+// companion object can also see private values and variables of the corresponding classes' instantiated objects
+class Person(val name: String, private val superheroName: String)
+
+object Person {
+  def showMeInnerSecret(x: Person) = x.superheroName
+}
+
+val clark = new Person("Clark Kent", "Superman")
+val peter = new Person("Peter Parker", "Spider-Man")
+
+Person.showMeInnerSecret(clark) should be("Superman")
+Person.showMeInnerSecret(peter) should be("Spider-Man")
