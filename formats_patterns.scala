@@ -4,10 +4,22 @@ val s = "Hello World"
 "Application %s".format(s) should be("Application Hello World")
 
 // character literals can be a single character 
+//format(a) is a string format, meaning the "%c".format(x)
+//will return the string representation of the char.
+val a = 'a'
+val b = 'B'
 
+"%c".format(a) should be("a")
+"%c".format(b) should be("B")
 
 // character literals can be an escape sequence
+val c = 'a' //unicode for a
+val e = '\"'
+val f = '\\'
 
+"%c".format(c) should be("a")
+"%c".format(e) should be("\"")
+"%c".format(f) should be("\\")
 
 // formatting can include numbers
 val j = 190
@@ -84,4 +96,66 @@ def goldilocks(expr: (String, String)) = expr match {
 goldilocks(("porridge", "Papa")) should be("Papa said someone's been eating my porridge")
 goldilocks(("chair", "Mama")) should be("Mama said someone's been sitting in my chair")
 
-// 
+// backquote can be used to refer to a stable variable in scope
+val foodItem = "porridge"
+
+def goldilocks(expr: (String, String)) = expr match {
+  case (`foodItem`, _) => "eating"
+  case ("chair", "Mama") => "sitting"
+  case ("bed", "Baby") => "sleeping"
+  case _ => "what?"
+}
+
+goldilocks(("porridge", "Papa")) should be("eating")
+goldilocks(("chair", "Mama")) should be("sitting")
+goldilocks(("porridge", "Cousin")) should be("eating")
+goldilocks(("beer", "Cousin")) should be("what?")
+
+// backquote can be used to refer to a method parameter as a stable variable
+def patternEquals(i: Int, j: Int) = j match {
+  case `i` => true
+  case _ => false
+}
+patternEquals(3, 3) should be(true)
+patternEquals(7, 9) should be(false)
+patternEquals(9, 9) should be(true)
+
+// pattern match against list
+val secondElement = List(1, 2, 3) match {
+  case x :: xs => xs.head
+  case _ => 0
+}
+
+secondElement should be(2)
+
+// patterns may be expanded
+val secondElement = List(1, 2, 3) match {
+  case x :: y :: xs => y
+  case _ => 0
+}
+
+secondElement should be(2)
+
+// same here but list's length is less than required element index
+val secondElement = List(1) match {
+  case x :: y :: xs => y // only matches a list with two or more items
+  case _ => 0
+}
+
+secondElement should be(0)
+
+// pattern match may be based on knowledge of number of elements
+val r = List(1, 2, 3) match {
+  case x :: y :: Nil => y // only matches a list with exactly two items
+  case _ => 0
+}
+
+r should be(0)
+
+// if pattern is exactly 1 element longer it will return Nil
+val r = List(1, 2, 3) match {
+  case x :: y :: z :: tail => tail
+  case _ => 0
+}
+
+r == Nil should be(true)
